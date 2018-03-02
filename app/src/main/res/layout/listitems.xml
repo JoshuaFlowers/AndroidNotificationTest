@@ -17,6 +17,11 @@
     android:focusableInTouchMode="true"
     android:inputType="textCapSentences" />
 
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="5" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/AddNotifButton1"
         android:layout_width="wrap_content"

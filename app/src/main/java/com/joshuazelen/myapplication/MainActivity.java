@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,7 +21,6 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 
@@ -32,8 +32,6 @@ public class MainActivity extends AppCompatActivity {
     public static PendingIntent contentPendingIntent;
     Context context;
     EditText mEdit1;
-    Object[] listItems;
-    ListView list;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -48,17 +46,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        listItems=new Object[]{new EditText(context), "apples", "Momo", "booty", 5};
-        //list=(ListView)findViewById(R.id.NotifList);
 
 
-        mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+       /* mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         Intent contentIntent = new Intent(context,MainActivity.class);
         contentPendingIntent = PendingIntent.getActivity(context,NOTIFICATION_ID,contentIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        mEdit1 = (EditText) findViewById(R.id.Notification_Name);*/
+
+        mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         mEdit1 = (EditText) findViewById(R.id.Notification_Name);
 
 
-        String[] myDataset = {"aples", "Big Bob", "Bunny"};
         rowList = new ArrayList<>();
 
 
@@ -67,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
 
         setRecyclerViewData();
-        //Notification note = buildNotification(context, mEdit1);
 
         mAdapter = new MyAdapter(rowList, context, new MyOnClickListener() {
 
@@ -83,56 +80,44 @@ public class MainActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        //mAdapter = new MyAdapter(myDataset);
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
-                //ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, listItems);
-                //list.setAdapter(adapter);
                 rowList.add((LinearLayout) LayoutInflater.from(MainActivity.this).inflate(R.layout.listitems,null, false));
                 mAdapter.notifyItemInserted(rowList.size());
 
             }
         });
-        //**********************
-
-
-        //deliverNotification(context, mEdit1);
-
-        //((LinearLayout) findViewById(mRecyclerView.getAdapter().getItemId(1))).;
-/*        FloatingActionButton fab1 = (FloatingActionButton) findViewById(R.id.AddNotifButton1);
-        fab1.setOnClickListener(new View.OnClickListener() {
-           @Override
-            public void onClick(View view){
-                deliverNotification(context, mEdit1);
-
-           }
-        });*/
     }
 
     private void setRecyclerViewData(){
-        for(int i=0;i<2;i++){
-            rowList.add((LinearLayout) LayoutInflater.from(this).inflate(R.layout.listitems,null, false));
-        }
+        rowList.add((LinearLayout) LayoutInflater.from(this).inflate(R.layout.listitems,null, false));
 
     }
 
     public static void deliverNotification(Context context, EditText editor){
+
+        /*Intent dismissNotificationIntent = new Intent(context, Notification.class);
+        dismissNotificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        dismissNotificationIntent.putExtra(NOTIFICATION_ID, notificationId);*/
+
+        Intent contentIntent = new Intent(context,NotificationActivity.class);
+        //contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        contentPendingIntent = NotificationActivity.getDismissIntent(NOTIFICATION_ID,context);
+
         NotificationCompat.Builder builder=new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.ic_strikethrough_s);
         builder.setContentTitle(editor.getText().toString());
         builder.setContentText(context.getString(R.string.notification_text));
         builder.setContentIntent(contentPendingIntent);
         builder.setPriority(Notification.PRIORITY_MAX);
-        builder.setAutoCancel(false);
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        //builder.
-        mNotificationManager.notify(++NOTIFICATION_ID,builder.build());
+        builder.setOngoing(true);
+        builder.setAutoCancel(false);
+        builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", contentPendingIntent);
+        mNotificationManager.notify(NOTIFICATION_ID++,builder.build());
 
     }
 
@@ -143,9 +128,10 @@ public class MainActivity extends AppCompatActivity {
         builder.setContentText(context.getString(R.string.notification_text));
         builder.setContentIntent(contentPendingIntent);
         builder.setPriority(Notification.PRIORITY_MAX);
-        builder.setAutoCancel(true);
+        builder.setAutoCancel(false);
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        //builder.
+        builder.setOngoing(true);
+        //builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", )
         return builder.build();
 
     }
