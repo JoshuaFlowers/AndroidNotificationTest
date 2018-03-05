@@ -23,13 +23,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static int NOTIFICATION_ID=0;
+    //public static int NOTIFICATION_ID=0;
     public static final String ACTION_NOTIFY="com.joshuazelen.constantnotification";
     public static NotificationManager mNotificationManager;
-    public static PendingIntent contentPendingIntent;
+    //public static PendingIntent contentPendingIntent;
     Context context;
     EditText mEdit1;
     private RecyclerView mRecyclerView;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 EditText mEdit = (EditText) findViewById(this.getId());
-                deliverNotification(context, mEdit);
+                NewCustomNotification.notify(context, mEdit);
             }
 
         });
@@ -97,16 +98,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    //////////***************////////////
+
     public static void deliverNotification(Context context, EditText editor){
 
         /*Intent dismissNotificationIntent = new Intent(context, Notification.class);
         dismissNotificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         dismissNotificationIntent.putExtra(NOTIFICATION_ID, notificationId);*/
-
+        int NOTIFICATION_ID = new Random(System.currentTimeMillis()).nextInt();
         Intent contentIntent = new Intent(context,NotificationActivity.class);
         //contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        contentPendingIntent = NotificationActivity.getDismissIntent(NOTIFICATION_ID,context);
-
+        PendingIntent contentPendingIntent = NotificationActivity.getDismissIntent(NOTIFICATION_ID,context);
         NotificationCompat.Builder builder=new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.ic_strikethrough_s);
         builder.setContentTitle(editor.getText().toString());
@@ -126,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setSmallIcon(R.drawable.ic_strikethrough_s);
         builder.setContentTitle(editor.getText().toString());
         builder.setContentText(context.getString(R.string.notification_text));
-        builder.setContentIntent(contentPendingIntent);
+        //builder.setContentIntent(contentPendingIntent);
         builder.setPriority(Notification.PRIORITY_MAX);
         builder.setAutoCancel(false);
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);

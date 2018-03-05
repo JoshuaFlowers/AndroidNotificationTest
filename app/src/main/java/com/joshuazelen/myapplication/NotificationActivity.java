@@ -18,16 +18,18 @@ public class NotificationActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.cancel(getIntent().getIntExtra(NOTIFICATION_ID,-1));
+        NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        int notifId = getIntent().getIntExtra(NOTIFICATION_ID,-1);
+        manager.cancel(notifId);
         finish();
     }
 
     public static PendingIntent getDismissIntent(int notificationId, Context context){
         Intent intent = new Intent(context, NotificationActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK );
         intent.putExtra(NOTIFICATION_ID, notificationId);
-        PendingIntent dismissIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        intent.setAction(Long.toString(System.currentTimeMillis()));
+        PendingIntent dismissIntent = PendingIntent.getActivity(context, 0, intent,PendingIntent.FLAG_ONE_SHOT);
         return dismissIntent;
     }
 }

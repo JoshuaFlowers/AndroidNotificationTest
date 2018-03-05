@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static java.security.AccessController.getContext;
@@ -23,9 +24,9 @@ import static java.security.AccessController.getContext;
  */
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-    private String[] mDataset;
+    //private String[] mDataset;
     private ArrayList<LinearLayout> mRows;
-    private static NotificationManager mNotificationManager;
+    //private static NotificationManager mNotificationManager;
     private Context mContext;
 
 
@@ -56,7 +57,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mEditText.setId(position);
-        holder.fab.setOnClickListener(new MyOnClickListener(position, mContext, holder.mEditText));
+        holder.fab.setOnClickListener(new MyOnClickListener(mContext, holder.mEditText, new Random(System.currentTimeMillis()).nextInt()));
     }
 
     @Override
