@@ -30,8 +30,6 @@ public class NewCustomNotification {
      * The unique identifier for this type of notification.
      */
     //private static final String NOTIFICATION_TAG = "ConstantNotification";
-    //private static int NOTIFICATION_ID = new Random(System.currentTimeMillis()).nextInt();
-    //public static PendingIntent contentPendingIntent;
 
 
     public static void notify(Context context, EditText editor){
@@ -48,7 +46,6 @@ public class NewCustomNotification {
         builder.setOngoing(true);
         builder.setAutoCancel(false);
         builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", contentPendingIntent);
-        //notify(context,builder.build());
 
         NotificationManager mNotificationManager = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
@@ -57,7 +54,6 @@ public class NewCustomNotification {
 
     public static void notify(Context context, EditText editor, int myId){
 
-        //int NOTIFICATION_ID = new Random(System.currentTimeMillis()).nextInt();
         int NOTIFICATION_ID = myId;
         PendingIntent contentPendingIntent = NotificationActivity.getDismissIntent(NOTIFICATION_ID,context);
 
@@ -70,7 +66,6 @@ public class NewCustomNotification {
         builder.setOngoing(true);
         builder.setAutoCancel(false);
         builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", contentPendingIntent);
-        //notify(context,builder.build());
 
         NotificationManager mNotificationManager = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());

@@ -101,43 +101,6 @@ public class MainActivity extends AppCompatActivity {
 
     //////////***************////////////
 
-    public static void deliverNotification(Context context, EditText editor){
-
-        /*Intent dismissNotificationIntent = new Intent(context, Notification.class);
-        dismissNotificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        dismissNotificationIntent.putExtra(NOTIFICATION_ID, notificationId);*/
-        int NOTIFICATION_ID = new Random(System.currentTimeMillis()).nextInt();
-        Intent contentIntent = new Intent(context,NotificationActivity.class);
-        //contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent contentPendingIntent = NotificationActivity.getDismissIntent(NOTIFICATION_ID,context);
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_strikethrough_s);
-        builder.setContentTitle(editor.getText().toString());
-        builder.setContentText(context.getString(R.string.notification_text));
-        builder.setContentIntent(contentPendingIntent);
-        builder.setPriority(Notification.PRIORITY_MAX);
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setOngoing(true);
-        builder.setAutoCancel(false);
-        builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", contentPendingIntent);
-        mNotificationManager.notify(NOTIFICATION_ID++,builder.build());
-
-    }
-
-    public static Notification buildNotification(Context context, EditText editor){
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_strikethrough_s);
-        builder.setContentTitle(editor.getText().toString());
-        builder.setContentText(context.getString(R.string.notification_text));
-        //builder.setContentIntent(contentPendingIntent);
-        builder.setPriority(Notification.PRIORITY_MAX);
-        builder.setAutoCancel(false);
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setOngoing(true);
-        //builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", )
-        return builder.build();
-
-    }
 
 
     @Override
