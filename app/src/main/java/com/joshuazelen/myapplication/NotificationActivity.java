@@ -5,7 +5,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+
+import java.util.LinkedHashSet;
 
 /**
  * Created by Joshua on 3/1/18.
@@ -21,6 +25,13 @@ public class NotificationActivity extends Activity {
         NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         int notifId = getIntent().getIntExtra(NOTIFICATION_ID,-1);
         manager.cancel(notifId);
+        SharedPreferences sharedPreferences = this.getSharedPreferences("NiftyNotiPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        LinkedHashSet<String> notifSet = new LinkedHashSet<String>(sharedPreferences.getStringSet("notifIds", new LinkedHashSet<String>(0)));
+        notifSet.remove(String.valueOf(notifId));
+        editor.putStringSet("notifIds", notifSet);
+        editor.remove(String.valueOf(notifId));
+        editor.commit();
         finish();
     }
 

@@ -3,31 +3,52 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
-    android:weightSum="100">
+    android:orientation="vertical"
+    android:paddingBottom="15dp"
+    android:paddingTop="10dp"
+    android:background="#FFFFFF">
 
-    <EditText
-    android:id="@+id/Notification_Name"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="90"
-    android:layout_gravity="right"
-    android:hint="@string/notification_title"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:inputType="textCapSentences" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:paddingBottom="5dp">
 
-    <Space
+        <EditText
+            android:id="@+id/Notification_Name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="90"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="@string/notification_title"
+            android:inputType="textCapSentences" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="5" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/AddNotifButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@android:drawable/ic_menu_add"
+            android:layout_gravity="end"/>
+
+    </LinearLayout>
+<!--
+    <Switch
+        android:id="@+id/StartupNotificationSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="5" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/AddNotifButton1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        app:srcCompat="@android:drawable/ic_menu_add" />
-
+        android:layout_weight="0"
+        android:text="Notify On Startup"
+        android:layout_gravity="end"
+        android:checked="true"/>
+        -->
 </LinearLayout>

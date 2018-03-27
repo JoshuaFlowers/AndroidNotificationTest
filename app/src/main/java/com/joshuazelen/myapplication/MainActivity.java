@@ -5,12 +5,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
+import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -21,123 +24,125 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Random;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    //public static int NOTIFICATION_ID=0;
-    public static final String ACTION_NOTIFY="com.joshuazelen.constantnotification";
     public static NotificationManager mNotificationManager;
-    //public static PendingIntent contentPendingIntent;
     Context context;
-    EditText mEdit1;
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private MyAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<LinearLayout> rowList;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //*********************
         super.onCreate(savedInstanceState);
+
+        if(savedInstanceState != null){
+
+        }
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
         context=getApplicationContext();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Initialize/get Shared Preference named "NiftyNotiPrefs" and preference editor
+        sharedPreferences = context.getSharedPreferences("NiftyNotiPrefs", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
-       /* mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        Intent contentIntent = new Intent(context,MainActivity.class);
-        contentPendingIntent = PendingIntent.getActivity(context,NOTIFICATION_ID,contentIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        mEdit1 = (EditText) findViewById(R.id.Notification_Name);*/
-
+        //Initialize notification manager
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        mEdit1 = (EditText) findViewById(R.id.Notification_Name);
 
+        rowList = new ArrayList<LinearLayout>();
 
-        rowList = new ArrayList<>();
-
-
+        //Set recyclerview to custom recyclerview with Id "my_recycler_view". RecyclerView was created in a layout file with custom parameters
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
-        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setHasFixedSize(false);
 
-        setRecyclerViewData();
 
-        mAdapter = new MyAdapter(rowList, context, new MyOnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                EditText mEdit = (EditText) findViewById(this.getId());
-                NewCustomNotification.notify(context, mEdit);
-            }
-
-        });
-        mRecyclerView.setAdapter(mAdapter);
 
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
+
+        //Add bar indicating separation of items in RecyclerView
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        //Get recycler view data from data previously saved in shared preferences
+        ArrayList<String> rowData = new ArrayList<String>(sharedPreferences.getStringSet("notifIds", new LinkedHashSet<String>(0)));
 
+        //Add new blank row to recyclerview data
+        rowData.add("");
+
+        //Creates new custom Adapter (MyAdapter) using the rowData obtained from shared preferences
+        mAdapter = new MyAdapter(rowData, context);
+
+        //Set recyclerview adapter to adapter created above
+        mRecyclerView.setAdapter(mAdapter);
+
+
+
+        //Set action for Floating Action Button on main screen to add new row when pressed
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                rowList.add((LinearLayout) LayoutInflater.from(MainActivity.this).inflate(R.layout.listitems,null, false));
-                mAdapter.notifyItemInserted(rowList.size());
-
+                mAdapter.addNewRow();
             }
         });
+
+
+        //make switch preference - TEST
+        SharedPreferences sharedPref =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        Boolean switchPref = sharedPref.getBoolean
+                (SettingsActivity.KEY_PREF_EXAMPLE_SWITCH, false);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state){
+        super.onSaveInstanceState(state);
     }
 
     private void setRecyclerViewData(){
-        rowList.add((LinearLayout) LayoutInflater.from(this).inflate(R.layout.listitems,null, false));
+        if(!sharedPreferences.getStringSet("notifIds", new HashSet(0)).isEmpty()){
+            LinkedHashSet<String> notifIds = new LinkedHashSet<String>(sharedPreferences.getStringSet("notifIds", new HashSet(0)));
+            for (String notif: notifIds){
+                //mAdapter.addRow(notif);
+                LinearLayout newRow = (LinearLayout) LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.listitems, null, false);
+                EditText newRowEditText = newRow.findViewById(R.id.Notification_Name);
+                FloatingActionButton newRowFab = (FloatingActionButton) newRow.findViewById(R.id.AddNotifButton1);
+
+                newRowEditText.setText(sharedPreferences.getString(notif,""));
+
+                int thisId = Integer.parseInt(notif);
+
+                newRowFab.setOnClickListener(new MyOnClickListener(context, newRowEditText, thisId));
+
+
+                rowList.add(newRow);
+            }
+        }
+        rowList.add((LinearLayout) LayoutInflater.from(MainActivity.this).inflate(R.layout.listitems, null, false));
 
     }
 
 
     //////////***************////////////
 
-    public static void deliverNotification(Context context, EditText editor){
-
-        /*Intent dismissNotificationIntent = new Intent(context, Notification.class);
-        dismissNotificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        dismissNotificationIntent.putExtra(NOTIFICATION_ID, notificationId);*/
-        int NOTIFICATION_ID = new Random(System.currentTimeMillis()).nextInt();
-        Intent contentIntent = new Intent(context,NotificationActivity.class);
-        //contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent contentPendingIntent = NotificationActivity.getDismissIntent(NOTIFICATION_ID,context);
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_strikethrough_s);
-        builder.setContentTitle(editor.getText().toString());
-        builder.setContentText(context.getString(R.string.notification_text));
-        builder.setContentIntent(contentPendingIntent);
-        builder.setPriority(Notification.PRIORITY_MAX);
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setOngoing(true);
-        builder.setAutoCancel(false);
-        builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", contentPendingIntent);
-        mNotificationManager.notify(NOTIFICATION_ID++,builder.build());
-
-    }
-
-    public static Notification buildNotification(Context context, EditText editor){
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_strikethrough_s);
-        builder.setContentTitle(editor.getText().toString());
-        builder.setContentText(context.getString(R.string.notification_text));
-        //builder.setContentIntent(contentPendingIntent);
-        builder.setPriority(Notification.PRIORITY_MAX);
-        builder.setAutoCancel(false);
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setOngoing(true);
-        //builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", )
-        return builder.build();
-
-    }
 
 
     @Override
@@ -155,9 +160,20 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+
+            return true;
+        }*/
+
+        if (id == R.id.action_reset_settings) {
+            editor.clear().commit();
+
             return true;
         }
+
+
 
         return super.onOptionsItemSelected(item);
     }
